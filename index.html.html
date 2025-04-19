@@ -1,0 +1,144 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Tes Koran Pengurangan</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f0f0f0;
+      padding: 30px;
+    }
+    #problem {
+      font-size: 3em;
+      margin: 20px 0;
+    }
+    table {
+      margin: 0 auto;
+      border-collapse: collapse;
+    }
+    td {
+      padding: 30px 50px;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      font-size: 2em;
+      cursor: pointer;
+      user-select: none;
+    }
+    td:hover {
+      background-color: #d0eaff;
+    }
+    #score, #timer {
+      margin-top: 20px;
+      font-size: 1.5em;
+      font-weight: bold;
+    }
+    #startScreen {
+      margin-bottom: 20px;
+    }
+  </style>
+
+<script>
+if (localStorage.getItem("sudahTes") === "true") {
+  document.body.innerHTML = "<h2 style='color:red;text-align:center;margin-top:100px;'>Tes sudah dilakukan. Halaman ini tidak bisa diulang.</h2>";
+} else {
+  localStorage.setItem("sudahTes", "true");
+}
+</script>
+
+</head>
+<body>
+  <h1>Tes Koran Pengurangan</h1>
+
+  <div id="startScreen">
+    <label for="duration">Pilih durasi tes (menit): </label>
+    <select id="duration">
+      <option value="1">1 menit</option>
+      <option value="2">2 menit</option>
+      <option value="5">5 menit</option>
+      <option value="15">15 menit</option>
+    </select>
+    <button onclick="startTest()">Mulai Tes</button>
+  </div>
+
+  <div id="timer" style="display: none;">Waktu: </div>
+  <div id="problem" style="display: none;">Siap?</div>
+
+  <div class="answer-table" id="answerTable" style="display: none;">
+    <table>
+      <tr>
+        <td onclick="submitAnswer(1)">1</td>
+        <td onclick="submitAnswer(2)">2</td>
+        <td onclick="submitAnswer(3)">3</td>
+      </tr>
+      <tr>
+        <td onclick="submitAnswer(4)">4</td>
+        <td onclick="submitAnswer(5)">5</td>
+        <td onclick="submitAnswer(6)">6</td>
+      </tr>
+      <tr>
+        <td onclick="submitAnswer(7)">7</td>
+        <td onclick="submitAnswer(8)">8</td>
+        <td onclick="submitAnswer(9)">9</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td onclick="submitAnswer(0)">0</td>
+        <td></td>
+      </tr>
+    </table>
+  </div>
+  <div id="score"></div>
+
+  <script>
+    let correct = 0;
+    let total = 0;
+    let currentProblem;
+    let timer;
+    let interval;
+
+    function generateProblem() {
+      const a = Math.floor(Math.random() * 10) + 1;
+      const b = Math.floor(Math.random() * 10) + 1;
+      currentProblem = { a, b, answer: a - b };
+      document.getElementById("problem").textContent = `${a} - ${b} = ?`;
+    }
+
+    function submitAnswer(val) {
+      if (val === currentProblem.answer) correct++;
+      total++;
+      generateProblem();
+    }
+
+    function startTest() {
+      const minutes = parseInt(document.getElementById("duration").value);
+      timer = minutes * 60;
+
+      document.getElementById("startScreen").style.display = "none";
+      document.getElementById("timer").style.display = "block";
+      document.getElementById("problem").style.display = "block";
+      document.getElementById("answerTable").style.display = "block";
+
+      generateProblem();
+      updateTimer();
+
+      interval = setInterval(() => {
+        timer--;
+        updateTimer();
+        if (timer <= 0) {
+          clearInterval(interval);
+          document.getElementById("problem").textContent = "Waktu Habis!";
+          document.getElementById("answerTable").style.display = "none";
+          document.getElementById("score").textContent = `Skor akhir: ${correct} benar, ${total - correct} salah dari total ${total} soal.`;
+        }
+      }, 1000);
+    }
+
+    function updateTimer() {
+      document.getElementById("timer").textContent = `Waktu: ${timer} detik`;
+    }
+  </script>
+</body>
+</html>
